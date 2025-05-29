@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ template "guestbook.fullname" . }}
+  labels:
+    app: {{ template "guestbook.name" . }}
+    chart: {{ template "guestbook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: {{ template "guestbook.name" . }}
+      release: {{ .Release.Name }}
+  strategy:
+    blueGreen:
+      activeService: {{ template "guestbook.fullname" . }}
+      previewService: {{ template "guestbook.fullname" . }}-preview
+  template:
+    metadata:
+      labels:
+        app: {{ template "guestbook.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image:  "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          envFrom:
+          - configMapRef:
+              name: feature-flags
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}          

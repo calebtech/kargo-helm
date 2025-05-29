@@ -6,7 +6,7 @@ metadata:
 spec:
   subscriptions:
   - image:
-      repoURL: ghcr.io/akuity/guestbook
+      repoURL: ghcr.io/calebtech/guestbook
       imageSelectionStrategy: SemVer
 ---
 apiVersion: kargo.akuity.io/v1alpha1

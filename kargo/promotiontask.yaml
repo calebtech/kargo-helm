@@ -6,20 +6,19 @@ metadata:
 spec:
   vars:
   - name: image
-    value: ghcr.io/akuity/guestbook
+    value: ghcr.io/calebtech/guestbook
   - name: repoURL
     value: https://github.com/calebtech/kargo-helm.git
   - name: branch
     value: main
   - name: envPath
   - name: argocdApp
-
   steps:
   - uses: git-clone
     config:
       repoURL: ${{ vars.repoURL }}
       checkout:
-      - commit: ${{ commitFrom( vars.repoURL ).ID }}
+      - commit: HEAD
         path: ./src
       - branch: ${{ vars.branch }}
         path: ./out
@@ -46,3 +45,14 @@ spec:
     config:
       apps:
       - name: ${{ vars.argocdApp }}
+steps:
+- uses: argocd-update
+  config:
+    apps:
+    - name: my-app
+      sources:
+      - repoURL: ${{ vars.repoURL }}
+        helm:
+          images:
+          - key: image.tag
+            value: ${{ imageFrom("my/image").Tag }}
