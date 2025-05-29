@@ -10,7 +10,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: 3
-  selector:
+  selector:        
     matchLabels:
       app: {{ template "guestbook.name" . }}
       release: {{ .Release.Name }}
